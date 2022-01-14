@@ -9,6 +9,9 @@ dependencies {
     implementation project(':airbyte-protocol:models')
     implementation project(':airbyte-db:lib')
 
+    // https://mvnrepository.com/artifact/org.codehaus.plexus/plexus-utils
+    implementation group: 'org.codehaus.plexus', name: 'plexus-utils', version: '3.2.1'
+
     implementation 'io.debezium:debezium-api:1.4.2.Final'
     implementation 'io.debezium:debezium-embedded:1.4.2.Final'
     implementation 'io.debezium:debezium-connector-mysql:1.4.2.Final'

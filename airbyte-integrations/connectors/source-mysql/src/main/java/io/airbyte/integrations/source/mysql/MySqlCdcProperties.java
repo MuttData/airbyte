@@ -13,6 +13,9 @@ public class MySqlCdcProperties {
 
     // debezium engine configuration
     props.setProperty("connector.class", "io.debezium.connector.mysql.MySqlConnector");
+    props.setProperty("database.history.skip.unparseable.ddl", "true");
+    props.setProperty("event.deserialization.failure.handling.mode", "warn");
+    props.setProperty("inconsistent.schema.handling.mode", "warn");
 
     // https://debezium.io/documentation/reference/connectors/mysql.html#mysql-boolean-values
     // https://debezium.io/documentation/reference/1.4/development/converters.html

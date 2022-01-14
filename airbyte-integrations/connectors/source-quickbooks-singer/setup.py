@@ -6,8 +6,8 @@
 from setuptools import find_packages, setup
 
 MAIN_REQUIREMENTS = [
-    "airbyte-cdk",
-    "tap-quickbooks @ https://github.com/airbytehq//tap-quickbooks/tarball/v1.0.5-airbyte",
+    "tap-quickbooks @ https://github.com/MuttData/tap-quickbooks/tarball/master",
+    "airbyte-cdk==0.1.6",
 ]
 
 TEST_REQUIREMENTS = [

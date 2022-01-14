@@ -3,6 +3,7 @@
 #
 
 
+import requests
 import json
 
 from airbyte_cdk.logger import AirbyteLogger
@@ -17,11 +18,38 @@ class SourceQuickbooksSinger(SingerSource):
 
     def _write_config(self, token):
         logger = AirbyteLogger()
-        logger.info("Credentials Refreshed")
+        logger.info("Credentials Refreshed, updating airbyte sources")
+
+        # Update config at config_path
+        with open(self.config_path) as file:
+            config = json.load(file)
+
+        config['refresh_token'] = token['refresh_token']
+
+        res = requests.post("http://localhost:8000/api/v1/workspaces/list")
+        workspace_id = res.json()['workspaces'][0]['workspaceId']
+
+        res = requests.post("http://localhost:8000/api/v1/sources/list", json={'workspaceId': workspace_id})
+        sources = filter(lambda x: 'quickbook' in x['name'].lower(), res.json()['sources'])
+
+        for source in sources:
+            requests.post(
+                "http://localhost:8000/api/v1/sources/update",
+                json={
+                    'sourceId': source['sourceId'],
+                    'connectionConfiguration': config,
+                    'name': source['sourceName']
+                }
+            )
+
+        with open(self.config_path, 'w') as file:
+            json.dump(config, file, indent=2)
+
 
     def check_config(self, logger: AirbyteLogger, config_path: str, config: json) -> AirbyteConnectionStatus:
         token = {"refresh_token": config["refresh_token"], "token_type": "Bearer", "access_token": "wrong", "expires_in": "-30"}
         extra = {"client_id": config["client_id"], "client_secret": config["client_secret"]}
+        self.config_path = config_path
 
         sandbox = bool(config.get("sandbox", False))
 
@@ -51,10 +79,16 @@ class SourceQuickbooksSinger(SingerSource):
             return AirbyteConnectionStatus(status=Status.FAILED, message=f"An exception occurred: {str(e)}")
 
     def discover_cmd(self, logger: AirbyteLogger, config_path: str) -> str:
+
+        with open(config_path) as file:
+            config = json.load(file)
+            self.check_config(logger, config_path, config)
+
         return f"{self.TAP_CMD} --config {config_path} --discover"
 
     def read_cmd(self, logger: AirbyteLogger, config_path: str, catalog_path: str, state_path: str = None) -> str:
         config_option = f"--config {config_path}"
         properties_option = f"--catalog {catalog_path}"
         state_option = f"--state {state_path}" if state_path else ""
+
         return f"{self.TAP_CMD} {config_option} {properties_option} {state_option}"

@@ -27,7 +27,14 @@ public interface WorkflowStateChangedListener {
     DELETED,
     RUNNING,
     SKIPPED_SCHEDULING,
-    UPDATED
+    UPDATED,
+    FAILED,
+    RESET,
+    CONTINUE_AS_RESET,
+    RETRY_FAILED_ACTIVITY,
+    QUARANTINED,
+    SUCCESS,
+    CANCELLED_FOR_RESET,
   }
 
   @Value

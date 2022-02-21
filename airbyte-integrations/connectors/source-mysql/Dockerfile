@@ -14,6 +14,5 @@ WORKDIR /airbyte
 
 ENV APPLICATION source-mysql
 
-LABEL io.airbyte.version=0.4.12
-
 LABEL io.airbyte.name=muttdata/source-mysql
+LABEL io.airbyte.version=0.5.5

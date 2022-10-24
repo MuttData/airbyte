@@ -36,7 +36,7 @@ class SourceSendgrid(AbstractSource):
         try:
             start_time = config.get("start_time")
             if start_time and isinstance(start_time, str):
-                pendulum.parse(start_time)
+                pendulum.parse(start_time)            
             authenticator = TokenAuthenticator(config["apikey"])
             scopes_gen = Scopes(authenticator=authenticator).read_records(sync_mode=SyncMode.full_refresh)
             next(scopes_gen)
@@ -49,6 +49,7 @@ class SourceSendgrid(AbstractSource):
     def streams(self, config: Mapping[str, Any]) -> List[Stream]:
         authenticator = TokenAuthenticator(config["apikey"])
         start_time = config.get("start_time")
+        end_time_filter = config.get("end_time")
 
         streams = [
             Lists(authenticator=authenticator),
@@ -58,7 +59,7 @@ class SourceSendgrid(AbstractSource):
             Segments(authenticator=authenticator),
             SingleSends(authenticator=authenticator),
             Templates(authenticator=authenticator),
-            Messages(authenticator=authenticator, start_time=start_time),
+            Messages(authenticator=authenticator, start_time=start_time, end_time_filter=end_time_filter),
             GlobalSuppressions(authenticator=authenticator, start_time=start_time),
             SuppressionGroups(authenticator=authenticator),
             SuppressionGroupMembers(authenticator=authenticator),

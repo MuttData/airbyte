@@ -218,8 +218,8 @@ class Messages(SendgridStream, SendgridStreamIncrementalMixin):
         if isinstance(params["start_time"], int):
             date_start = datetime.datetime.utcfromtimestamp(params["start_time"]).strftime(time_filter_template)
         else:
-            date_start = params["start_time"]
-        date_end = datetime.datetime.utcfromtimestamp(int(params["end_time"])).strftime(time_filter_template)
+            date_start = params["start_time"]   
+        date_end = datetime.datetime.utcfromtimestamp(int(params["end_time_filter"])).strftime(time_filter_template)
         queryapi = f'last_event_time BETWEEN TIMESTAMP "{date_start}" AND TIMESTAMP "{date_end}"'
         params["query"] = urllib.parse.quote(queryapi)
         params["limit"] = self.limit

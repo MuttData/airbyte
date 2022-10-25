@@ -49,7 +49,12 @@ class SourceSendgrid(AbstractSource):
     def streams(self, config: Mapping[str, Any]) -> List[Stream]:
         authenticator = TokenAuthenticator(config["apikey"])
         start_time = config.get("start_time")
-        end_time_filter = config.get("end_time")
+        # end_time_filter = config.get("end_time")
+
+        incremental_stream_kwargs = {
+            "start_time": config.get("start_time"),
+            "end_time_filter": config.get("end_time"),
+        }
 
         streams = [
             Lists(authenticator=authenticator),
@@ -59,14 +64,14 @@ class SourceSendgrid(AbstractSource):
             Segments(authenticator=authenticator),
             SingleSends(authenticator=authenticator),
             Templates(authenticator=authenticator),
-            Messages(authenticator=authenticator, start_time=start_time, end_time_filter=end_time_filter),
-            GlobalSuppressions(authenticator=authenticator, start_time=start_time),
+            Messages(authenticator=authenticator, **incremental_stream_kwargs),
+            GlobalSuppressions(authenticator=authenticator,  **incremental_stream_kwargs),
             SuppressionGroups(authenticator=authenticator),
             SuppressionGroupMembers(authenticator=authenticator),
-            Blocks(authenticator=authenticator, start_time=start_time),
-            Bounces(authenticator=authenticator, start_time=start_time),
-            InvalidEmails(authenticator=authenticator, start_time=start_time),
-            SpamReports(authenticator=authenticator, start_time=start_time),
+            Blocks(authenticator=authenticator,  **incremental_stream_kwargs),
+            Bounces(authenticator=authenticator,  **incremental_stream_kwargs),
+            InvalidEmails(authenticator=authenticator,  **incremental_stream_kwargs),
+            SpamReports(authenticator=authenticator,  **incremental_stream_kwargs),
         ]
 
         return streams

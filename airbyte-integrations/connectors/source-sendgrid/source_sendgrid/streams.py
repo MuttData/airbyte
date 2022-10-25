@@ -72,13 +72,14 @@ class SendgridStreamOffsetPagination(SendgridStream):
 class SendgridStreamIncrementalMixin(HttpStream, ABC):
     cursor_field = "created"
 
-    def __init__(self, start_time: Optional[Union[int, str]], **kwargs):
+    def __init__(self, start_time: Optional[Union[int, str]],end_time_filter: Optional[Union[int, str]], **kwargs):
         super().__init__(**kwargs)
         self._start_time = start_time or 0
         # for backward compatibility
         self._start_time = start_time
+        self._end_time = end_time_filter
         if isinstance(self._start_time, str):
-            self._start_time = int(pendulum.parse(self._start_time).timestamp())
+            self._start_time = int(pendulum.parse(self._start_time).timestamp()) 
 
     def get_updated_state(self, current_stream_state: MutableMapping[str, Any], latest_record: Mapping[str, Any]) -> Mapping[str, Any]:
         """
@@ -219,7 +220,8 @@ class Messages(SendgridStream, SendgridStreamIncrementalMixin):
             date_start = datetime.datetime.utcfromtimestamp(params["start_time"]).strftime(time_filter_template)
         else:
             date_start = params["start_time"]   
-        date_end = datetime.datetime.utcfromtimestamp(int(params["end_time_filter"])).strftime(time_filter_template)
+        date_end = datetime.datetime.utcfromtimestamp(int(self._end_time)).strftime(time_filter_template)
+        print(f"INFOOO: Start Date-->{date_start} - End Date-->{date_end}")
         queryapi = f'last_event_time BETWEEN TIMESTAMP "{date_start}" AND TIMESTAMP "{date_end}"'
         params["query"] = urllib.parse.quote(queryapi)
         params["limit"] = self.limit

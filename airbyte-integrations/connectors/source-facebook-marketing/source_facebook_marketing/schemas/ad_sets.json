@@ -102,6 +102,32 @@
         }
       }
     },
+    "learning_stage_info": {
+      "type": ["null", "object"],
+      "properties": {
+        "id": {
+          "type": ["null", "string"]
+        },
+        "learning_stage_info": {
+          "type": ["null", "object"],
+          "properties": {
+            "attribution_windows": {
+              "type": ["null", "array"],
+              "items": ["null", "string"]
+            },
+            "conversions": {
+              "type": ["null", "integer"]
+            },
+            "last_sig_edit_ts": {
+              "type": ["null", "integer"]
+            },
+            "status": {
+              "type": ["null", "string"]
+            }
+          }
+        }
+        }
+    },
     "adlabels": {
       "type": ["null", "array"],
       "items": {

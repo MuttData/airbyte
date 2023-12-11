@@ -128,6 +128,20 @@
         }
         }
     },
+    "attribution_spec": {
+      "type": ["null", "array"],
+      "items": {
+        "type": "object",
+        "properties": {
+          "event_type": {
+            "type": "string"
+          },
+          "window_days": {
+            "type": "integer"
+          }
+        }
+      }
+    },
     "adlabels": {
       "type": ["null", "array"],
       "items": {

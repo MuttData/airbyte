@@ -44,11 +44,12 @@ class CheckConnectorUsesPoetry(PackagingCheck):
 
 class CheckPublishToPyPiIsEnabled(PackagingCheck):
     name = "Python connectors must have PyPi publishing enabled"
-    description = f"Python connectors must have [PyPi](https://pypi.org/) publishing enabled in their `{consts.METADATA_FILE_NAME}` file. This is declared by setting `remoteRegistries.pypi.enabled` to `true` in {consts.METADATA_FILE_NAME}. This is to ensure that all connectors can be published to PyPi and can be used in `airbyte-lib`."
+    description = f"Python connectors must have [PyPi](https://pypi.org/) publishing enabled in their `{consts.METADATA_FILE_NAME}` file. This is declared by setting `remoteRegistries.pypi.enabled` to `true` in {consts.METADATA_FILE_NAME}. This is to ensure that all connectors can be published to PyPi and can be used in `PyAirbyte`."
     applies_to_connector_languages = [
         ConnectorLanguage.PYTHON,
         ConnectorLanguage.LOW_CODE,
     ]
+    applies_to_connector_types = ["source"]
 
     def _run(self, connector: Connector) -> CheckResult:
         publish_to_pypi_is_enabled = get(connector.metadata, "remoteRegistries.pypi.enabled", False)
@@ -86,7 +87,7 @@ class CheckConnectorLicense(PackagingCheck):
 
 class CheckConnectorLicenseMatchInPyproject(PackagingCheck):
     name = f"Connector license in {consts.METADATA_FILE_NAME} and {consts.PYPROJECT_FILE_NAME} file must match"
-    description = f"Connectors license in {consts.METADATA_FILE_NAME} and {consts.PYPROJECT_FILE_NAME} file must match. This is to ensure that all connectors are consistently licensed"
+    description = f"Connectors license in {consts.METADATA_FILE_NAME} and {consts.PYPROJECT_FILE_NAME} file must match. This is to ensure that all connectors are consistently licensed."
     applies_to_connector_languages = [
         ConnectorLanguage.PYTHON,
         ConnectorLanguage.LOW_CODE,

@@ -53,67 +53,49 @@
     "average_ecpi": {
       "type": ["null", "number"]
     },
-    "account_login_unique_users": {
+    "cx_clip_app_settings_preferences_switch_top_ups_checked_unique_users": {
       "type": ["null", "number"]
     },
-    "account_login_event_counter": {
+    "cx_clip_app_settings_preferences_switch_top_ups_checked_event_counter": {
       "type": ["null", "number"]
     },
-    "account_login_sales": {
+    "cx_clip_app_settings_preferences_switch_top_ups_checked_sales": {
       "type": ["null", "number"]
     },
-    "af_complete_registration_unique_users": {
+    "pmkt_clip_app_settings_preferences_switch_installments_checked_unique_users": {
       "type": ["null", "number"]
     },
-    "af_complete_registration_event_counter": {
+    "pmkt_clip_app_settings_preferences_switch_installments_checked_event_counter": {
       "type": ["null", "number"]
     },
-    "af_complete_registration_sales": {
+    "pmkt_clip_app_settings_preferences_switch_installments_checked_sales": {
       "type": ["null", "number"]
     },
-    "af_purchase_registration_unique_users": {
+    "pmkt_payment_xpay_txn_successful_link_link_shared_users": {
       "type": ["null", "number"]
     },
-    "af_purchase_registration_event_counter": {
+    "pmkt_payment_xpay_txn_successful_link_link_shared_event_counter": {
       "type": ["null", "number"]
     },
-    "af_purchase_registration_sales": {
+    "pmkt_payment_xpay_txn_successful_link_link_shared_sales": {
       "type": ["null", "number"]
     },
-    "checkout_success_unique_users": {
+    "pmkt_payment_xpay_txn_successful_link_viewed_unique_users": {
       "type": ["null", "number"]
     },
-    "checkout_success_event_counter": {
+    "pmkt_payment_xpay_txn_successful_link_viewed_event_counter": {
       "type": ["null", "number"]
     },
-    "checkout_success_sales": {
+    "pmkt_payment_xpay_txn_successful_link_viewed_sales": {
       "type": ["null", "number"]
     },
-    "create_product_complete_unique_users": {
+    "preferences_top_ups_unique_users": {
       "type": ["null", "number"]
     },
-    "create_product_complete_event_counter": {
+    "preferences_top_ups_event_counter": {
       "type": ["null", "number"]
     },
-    "create_product_complete_sales": {
-      "type": ["null", "number"]
-    },
-    "init_appsflyer_id_unique_users": {
-      "type": ["null", "number"]
-    },
-    "init_appsflyer_id_event_counter": {
-      "type": ["null", "number"]
-    },
-    "init_appsflyer_id_sales": {
-      "type": ["null", "number"]
-    },
-    "pay_premium_pkg_unique_users": {
-      "type": ["null", "number"]
-    },
-    "pay_premium_pkg_event_counter": {
-      "type": ["null", "number"]
-    },
-    "pay_premium_pkg_sales": {
+    "preferences_top_ups_sales": {
       "type": ["null", "number"]
     }
   }

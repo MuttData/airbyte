@@ -4,7 +4,11 @@
     "$schema": "http://json-schema.org/draft-07/schema#",
     "title": "Appsflyer Spec",
     "type": "object",
-    "required": ["app_id", "api_token", "start_date"],
+    "required": [
+      "app_id",
+      "api_token",
+      "start_date"
+    ],
     "additionalProperties": false,
     "properties": {
       "app_id": {
@@ -19,14 +23,92 @@
       "start_date": {
         "type": "string",
         "description": "The default value to use if no bookmark exists for an endpoint. Raw Reports historical lookback is limited to 90 days.",
-        "examples": ["2021-11-16", "2021-11-16 15:00:00"],
+        "examples": [
+          "2021-11-16",
+          "2021-11-16 15:00:00"
+        ],
         "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}( [0-9]{2}:[0-9]{2}:[0-9]{2})?$"
       },
       "timezone": {
         "type": "string",
         "description": "Time zone in which date times are stored. The project timezone may be found in the App settings in the AppsFlyer console.",
         "default": "UTC",
-        "examples": ["US/Pacific", "UTC"]
+        "examples": [
+          "US/Pacific",
+          "UTC"
+        ]
+      },
+      "events": {
+        "type": "array",
+        "title": "Custom In App Events Streams",
+        "description": "Streams to fetch specific events from un-organic in app events raw endpoint.",
+        "items": {
+          "type": "object",
+          "required": [
+            "event_name"
+          ],
+          "properties": {
+            "event_name": {
+              "type": "string",
+              "title": "Event Name",
+              "description": "The name of the event you wan to filter by."
+            },
+            "lookback_window": {
+              "type": "integer",
+              "title": "Lookback window",
+              "default": 31,
+              "description": "Amount of days you want to look back in every request, from last fetched date."
+            },
+            "additional_fields": {
+              "type": "array",
+              "title": "Additional Fields",
+              "description": "",
+              "items": {
+                "title": "AdditionalFields",
+                "type": "string",
+                "enum": [
+                  "app_type",
+                  "custom_data",
+                  "network_account_id",
+                  "install_app_store",
+                  "contributor1_match_type",
+                  "contributor2_match_type",
+                  "contributor3_match_type",
+                  "campaign_type",
+                  "conversion_type",
+                  "match_type",
+                  "gp_referrer",
+                  "gp_click_time",
+                  "gp_install_begin",
+                  "gp_broadcast_referrer",
+                  "keyword_match_type",
+                  "keyword_id",
+                  "att",
+                  "amazon_aid",
+                  "device_category",
+                  "device_model",
+                  "device_download_time",
+                  "deeplink_url",
+                  "oaid",
+                  "is_lat",
+                  "store_reinstall",
+                  "placement",
+                  "mediation_network",
+                  "segment",
+                  "ad_unit",
+                  "monetization_network",
+                  "impressions",
+                  "blocked_reason",
+                  "blocked_reason_value",
+                  "blocked_reason_rule",
+                  "blocked_sub_reason",
+                  "rejected_reason",
+                  "rejected_reason_value"
+                ]
+              }
+            }
+          }
+        }
       }
     }
   }

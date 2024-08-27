@@ -3,6 +3,7 @@
 #
 
 import csv
+from functools import lru_cache
 import logging
 from abc import ABC
 from datetime import date, datetime, timedelta
@@ -12,11 +13,15 @@ from typing import Any, Callable, Dict, Iterable, List, Mapping, MutableMapping,
 
 import pendulum
 import requests
+import airbyte_cdk.sources.utils.casing as casing
+
 from airbyte_cdk.sources import AbstractSource
 from airbyte_cdk.sources.streams import Stream
+from airbyte_cdk.sources.streams.core import package_name_from_class
 from airbyte_cdk.sources.streams.http import HttpStream
 from airbyte_cdk.sources.streams.http.requests_native_auth import TokenAuthenticator
 from airbyte_cdk.sources.utils.transform import TransformConfig, TypeTransformer
+from airbyte_cdk.sources.utils.schema_helpers import ResourceSchemaLoader
 from pendulum.tz.timezone import Timezone
 
 from .fields import *
@@ -238,14 +243,48 @@ class EventsMixin:
             yield from self.get_records(row, events)
 
 
-class InAppEvents(RawDataMixin, IncrementalAppsflyerStream):
-    intervals = 31
+class InAppEvents(IncrementalAppsflyerStream):
     cursor_field = "event_time"
+    schema_name = "in_app_events"
+
+    def __init__(self, event_name: str = None, lookback_window: int = 31, fields: Optional[list] = None, **kwargs):
+        super().__init__(**kwargs)
+        self.event_name = event_name
+        self.intervals = lookback_window
+        self.additional_fields = fields if fields else additional_fields.raw_data
+
+    @property
+    def name(self) -> str:
+        """We override stream name to let the user change it via configuration."""
+        name = f"InAppEvent_{self.event_name}" if self.event_name else self.__class__.__name__
+        return casing.camel_to_snake(name)
+
+    @lru_cache(maxsize=None)
+    def get_json_schema(self) -> Mapping[str, Any]:
+        """
+        :return: A dict of the JSON schema representing this stream.
+
+        The default implementation of this method looks for a JSONSchema file with the same name as this stream's "name" property.
+        Override as needed.
+        """
+        return ResourceSchemaLoader(package_name_from_class(self.__class__)).get_schema(self.schema_name)
 
     def path(
         self, stream_state: Mapping[str, Any] = None, stream_slice: Mapping[str, Any] = None, next_page_token: Mapping[str, Any] = None
     ) -> str:
         return f"raw-data/export/app/{self.app_id}/in_app_events_report/v5"
+
+    def request_params(
+        self, stream_state: Mapping[str, Any], stream_slice: Mapping[str, any] = None, next_page_token: Mapping[str, Any] = None
+    ) -> MutableMapping[str, Any]:
+        params = super().request_params(stream_state, stream_slice, next_page_token)
+        params["from"] = stream_slice.get(self.cursor_field).to_date_string()
+        params["to"] = stream_slice.get(self.cursor_field + "_end").to_date_string()
+        params["event_name"] = self.event_name
+        # use currency set in the app settings to align with aggregate api currency.
+        params["currency"] = "preferred"
+
+        return params
 
 
 class OrganicInAppEvents(RawDataMixin, IncrementalAppsflyerStream):
@@ -400,7 +439,10 @@ class SourceAppsflyer(AbstractSource):
         config["end_date"] = pendulum.now(timezone)
         logging.getLogger("airbyte").log(logging.INFO, f"Using start_date: {config['start_date']}, end_date: {config['end_date']}")
         auth = TokenAuthenticator(token=config["api_token"])
-        return [
+        events = config.get("events", [])
+        del config["events"]
+
+        return [InAppEvents(authenticator=auth, **config, **event) for event in events] + [
             InAppEvents(authenticator=auth, **config),
             OrganicInAppEvents(authenticator=auth, **config),
             RetargetingInAppEvents(authenticator=auth, **config),

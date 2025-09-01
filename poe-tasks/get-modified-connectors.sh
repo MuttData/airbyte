@@ -10,6 +10,8 @@ DEFAULT_BRANCH="master"
 JAVA=false
 NO_JAVA=false
 JSON=false
+PREV_COMMIT=false
+LOCAL_CDK=false
 
 # parse flags
 while [[ $# -gt 0 ]]; do
@@ -23,6 +25,12 @@ while [[ $# -gt 0 ]]; do
     --json|json)
       JSON=true
       ;;
+    --prev-commit|--compare-prev)
+      PREV_COMMIT=true
+      ;;
+    --local-cdk|local-cdk)
+      LOCAL_CDK=true
+      ;;
     *)
       echo "Unknown argument: $1" >&2;
       exit 1
@@ -31,8 +39,13 @@ while [[ $# -gt 0 ]]; do
   shift
 done
 
-# 1) update remote default branch quietly
-git fetch --quiet origin $DEFAULT_BRANCH
+# 1) Fetch the latest from the default branch (using the correct remote)
+if git remote get-url upstream &>/dev/null; then
+  REMOTE="upstream"
+else
+  REMOTE="origin"
+fi
+git fetch --quiet "$REMOTE" "$DEFAULT_BRANCH"
 
 # 2) set up ignore patterns
 ignore_patterns=(
@@ -44,10 +57,22 @@ ignore_patterns=(
 ignore_globs="($(IFS='|'; echo "${ignore_patterns[*]}"))$"
 
 # 3) collect all file changes
-committed=$(git diff --name-only origin/"$DEFAULT_BRANCH"...HEAD)
-staged=$(git diff --cached --name-only)
-unstaged=$(git diff --name-only)
-untracked=$(git ls-files --others --exclude-standard)
+if $PREV_COMMIT; then
+  # Compare only the last commit; diff-tree is faster and more precise.
+  # Intended for master, where we diff the current squashed commit against the previous squashed commit.
+  committed=$(git diff-tree --no-commit-id -r --name-only HEAD)
+  staged=""
+  unstaged=""
+  untracked=""
+else
+  # Default behavior
+  # This is for a PR branch.
+  git fetch --quiet "$REMOTE" "$DEFAULT_BRANCH"
+  committed=$(git diff --name-only "${REMOTE}/${DEFAULT_BRANCH}"...HEAD)
+  staged=$(git diff --cached --name-only)
+  unstaged=$(git diff --name-only)
+  untracked=$(git ls-files --others --exclude-standard)
+fi
 
 # 4) merge into one list
 all_changes=$(printf '%s\n%s\n%s\n%s' "$committed" "$staged" "$unstaged" "$untracked")
@@ -69,7 +94,12 @@ dirs=$(printf '%s\n' "$connectors_paths" \
 connectors=()
 if [ -n "$dirs" ]; then
   while IFS= read -r d; do
-    connectors+=("$d")
+    connector_folder="airbyte-integrations/connectors/${d}"
+    if [[ -d "$connector_folder" ]]; then
+      connectors+=("$d")
+    else
+      echo "⚠️ '$d' directory was not found. This can happen if a connector is removed. Skipping." >&2
+    fi
   done <<< "$(printf '%s\n' "$dirs" | sort -u)"
 fi
 
@@ -104,9 +134,35 @@ print_list() {
 
 # Allow empty arrays without 'unbound variable' error from here on out.
 set +u
+# 10) If --local-cdk flag is set, also add Java connectors with useLocalCdk = true regardless of changes.
+if $LOCAL_CDK; then
+  echo "Finding Java Bulk CDK connectors with version = local..." >&2
 
-# 10) Print all if no filters applied
+  for connector_dir in airbyte-integrations/connectors/*; do
+    if [[ -d "$connector_dir" ]]; then
+      # Check if it's a Java connector (either with build.gradle or build.gradle.kts)
+      if [ -f "$connector_dir/build.gradle" ] || [ -f "$connector_dir/build.gradle.kts" ]; then
+        connector_name=$(basename "$connector_dir")
 
+        # Determine which build file exists
+        build_file="build.gradle"
+        if [ -f "$connector_dir/build.gradle.kts" ]; then
+          build_file="build.gradle.kts"
+        fi
+
+        # Search for cdk = 'local' or cdk = "local" in airbyteBulkConnector block
+        if grep -q "airbyteBulkConnector" "$connector_dir/$build_file" && grep -q "cdk *= *['\"]local['\"]" "$connector_dir/$build_file"; then
+          connectors+=("$connector_name")
+        fi
+      fi
+    fi
+  done
+
+  # Remove any duplicates using sort, parse it using mapfile and assign to $connectors.
+  mapfile -t connectors < <(printf '%s\n' "${connectors[@]}" | sort -u)
+fi
+
+# 11) Print all if no filters applied
 if ! $JAVA && ! $NO_JAVA; then
   print_list "${connectors[@]}"
   exit 0

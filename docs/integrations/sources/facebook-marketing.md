@@ -13,9 +13,9 @@ This page contains the setup guide and reference information for the [Facebook M
 -  **For Airbyte Cloud**: If you are not the owner/admin of the Ad account, you must be granted [permissions to access the Ad account](https://www.facebook.com/business/help/155909647811305?id=829106167281625) by an admin.
 <!-- /env:cloud -->
 <!-- env:oss -->
--  **For Airbyte Open Source**: 
-   - [Facebook app](https://developers.facebook.com/apps/) with the Marketing API enabled 
-   - The following permissions: [ads_management](https://developers.facebook.com/docs/permissions#a), [ads_read](https://developers.facebook.com/docs/permissions#a), [business_management](https://developers.facebook.com/docs/permissions#b) and [read_insights](https://developers.facebook.com/docs/permissions#r). 
+-  **For Airbyte Open Source**:
+   - [Facebook app](https://developers.facebook.com/apps/) with the Marketing API enabled
+   - The following permissions: [ads_management](https://developers.facebook.com/docs/permissions#a), [ads_read](https://developers.facebook.com/docs/permissions#a), [business_management](https://developers.facebook.com/docs/permissions#b) and [read_insights](https://developers.facebook.com/docs/permissions#r).
 <!-- /env:oss -->
 
 ## Setup guide
@@ -23,7 +23,7 @@ This page contains the setup guide and reference information for the [Facebook M
 ### Set up Facebook Marketing
 
 <!-- env:cloud -->
-#### For Airbyte Cloud: 
+#### For Airbyte Cloud:
 
 1. [Log into your Airbyte Cloud](https://cloud.airbyte.com/workspaces) account.
 2. Click Sources and then click + New source.
@@ -41,27 +41,105 @@ This page contains the setup guide and reference information for the [Facebook M
 4. Enter a name for the Facebook Marketing connector.
 <FieldAnchor field="access_token">
 5. In the **Access Token** field, enter the Marketing API access token.
-   
-#### (For Airbyte Open Source) Generate an access token and request a rate limit increase
+</FieldAnchor>
 
-To set up Facebook Marketing as a source in Airbyte Open Source, you will first need to create a Facebook app and generate a Marketing API access token. You will then need to request a rate limit increase from Facebook to ensure your syncs are successful. 
+### Airbyte Open Source
 
-1. Navigate to [Meta for Developers](https://developers.facebook.com/apps/) and follow the steps provided in the [Facebook documentation](https://developers.facebook.com/docs/development/create-an-app/) to create a Facebook app.
-2. While creating the app, when you are prompted for "What do you want your app to do?", select **Other**. You will also need to set the app type to **Business** when prompted.
-3. From your App’s dashboard, [set up the Marketing API](https://developers.facebook.com/docs/marketing-apis/get-started).
-4. Generate a Marketing API access token: From your App’s Dashboard, click **Marketing API** --> **Tools**. Select all the available token permissions (`ads_management`, `ads_read`, `read_insights`, `business_management`) and click **Get token**. Copy the generated token for later use.
-5. Request a rate limit increase: Facebook [heavily throttles](https://developers.facebook.com/docs/marketing-api/overview/authorization#limits) API tokens generated from Facebook apps with the default Standard Access tier, making it infeasible to use the token for syncs with Airbyte. You'll need to request an upgrade to Advanced Access for your app on the following permissions:
+This guide outlines the steps required to configure your Meta Developer account and create an app to utilize the Facebook Marketing API.
 
-   - Ads Management Standard Access
-   - ads_read
-   - Ads_management
+Follow these five key steps:
 
-   See the Facebook [documentation on Authorization](https://developers.facebook.com/docs/marketing-api/overview/authorization/#access-levels) to request Advanced Access to the relevant permissions.
+1.  **Register as a Meta Developer:** If you haven't already, create your developer account.
+2.  **Create a New App:** Set up a new application within your Developer Dashboard.
+3.  **Integrate the Marketing API:** Add the Marketing API product to your newly created app.
+4.  **Generate an Access Token:** Obtain the necessary credentials to authenticate your API requests.
+5.  **Request Increased Rate Limits:** Ensure your app can handle the required data volume by requesting Advanced Access.
+
+### 1. Register as a Meta Developer
+
+A Meta Developer account is your gateway to the App Dashboard, SDKs, APIs, development tools, and documentation.
+
+To register, follow the official instructions: 🔗 [Register as a Meta Developer](https://developers.facebook.com/docs/development/register/)
+
+### 2. Create a New App
+
+Your Meta app serves as a container for your API credentials and permissions. Meta uses it to monitor API usage, enforce rate limits, and ensure application security.
+
+- Go to the 🔗 [Meta for Developers App Dashboard](https://developers.facebook.com/apps/) and click **Create App**.
+
+- **Important:**
+  During the setup process, at the **"Use case"** step, select:
+  > **Create an app without a use case**
+  > *Choose this option if you'd like to get an app ID without automatically adding any permissions, features, or products.*
+
+- **App Type:**
+  Choose **Business** as the app type when prompted.
+
+### 3. Add the Marketing API Product
+
+After creating your app, you’ll need to enable the Marketing API to begin making requests.
+
+- In your app’s dashboard, open the sidebar menu.
+- Click **Add Product**.
+- Find and select **Marketing API** from the list of available products.
+
+📚 **Further Reading:** For an overview of the Marketing API, see: [Facebook Developer Marketing API Docs](https://developers.facebook.com/docs/marketing-apis)
+
+
+### 4. Generate an Access Token
+
+To authorize your application to interact with the Facebook Marketing API, you'll need to generate an access token with the appropriate permissions.
+
+- From your app's dashboard, go to **Marketing API > Tools**.
+
+- In the **Token Permissions** section, select the following permissions:
+  - `ads_management`: Manage ads and campaigns.
+  - `ads_read`: Read ad and campaign data.
+  - `read_insights`: Access insights data for ads, ad sets, and campaigns.
+  - `business_management`: Manage business assets (often required to access ad accounts connected to a Meta Business Manager).
+
+- Click **Get Token** to generate the access token.
+
+- **Copy the generated token securely.**
+  Use this Access Token to authenticate your API calls when using the “Service Account Key Authentication” method.
 
 :::tip
-You can use the [Access Token Tool](https://developers.facebook.com/tools/accesstoken) at any time to view your existing access tokens, including their assigned permissions and lifecycles.
+You can always view your existing access tokens, their permissions, and lifecycles using the 🔗 [Access Token Tool](https://developers.facebook.com/tools/accesstoken).
 :::
-</FieldAnchor>
+
+### 5. Request Increased Rate Limits
+
+By default, API tokens generated from apps with "Standard Access" are heavily throttled by Facebook.
+
+This can make them unsuitable for applications requiring frequent or large data syncs (like with Airbyte).
+
+To ensure reliable performance, you'll need to request "Advanced Access."
+
+- **Access App Review**
+  - From your app's dashboard, go to **App Review > Permissions and Features**.
+
+- **Identify Required Permissions**
+  - For each of the following permissions marked as "Standard Access", click the **Request advanced access** button:
+    - `ads_read`
+    - `ads_management`
+  - Facebook may prompt you to fill out a form detailing how the permission is used.
+
+- **Complete Business Verification**
+  - Make sure your app is associated with a **verified Business Manager account**.
+  - This is a [prerequisite](https://developers.facebook.com/docs/marketing-api/get-started/authorization/#business-verification) for obtaining Advanced Access.
+
+- **Submit the App Review Request**
+  - Once all information is provided, submit the request through the App Review interface.
+  - Monitor the status in the dashboard as Facebook reviews your application.
+
+- **Meet Rate Limit Requirements**
+	- Once you’ve been granted advanced access, you must consistently make at least 1,500 Marketing API calls within any rolling 15-day window to [maintain your status](https://developers.facebook.com/docs/marketing-api/get-started/authorization/#permissions-and-features).
+	- Facebook continuously evaluates your API activity based on the past 15 days, not just immediately after approval.
+	- Falling below the 1,500 call threshold during any 15-day period may result in your advanced access being revoked.
+
+
+📚 **Guidance:** Refer to Facebook's official documentation on [Access Levels and Authorization](https://developers.facebook.com/docs/marketing-api/get-started/authorization/) for detailed instructions on requesting Advanced Access.
+
 <!-- /env:oss -->
 
 #### Facebook Marketing Source Settings
@@ -98,8 +176,12 @@ You can use the [Access Token Tool](https://developers.facebook.com/tools/access
 7. (Optional) Toggle the **Fetch Thumbnail Images** button to fetch the `thumbnail_url` and store the result in `thumbnail_data_url` for each [Ad Creative](https://developers.facebook.com/docs/marketing-api/creative/).
 </FieldAnchor>
 
+<FieldAnchor field="default_ads_insights_action_breakdowns">
+8. (Optional) If needed, you can change default action breakdowns for Built-in Ads Insights stream. Remove all if you need to make it empty list or change default values.
+</FieldAnchor>
+
 <FieldAnchor field="custom_insights">
-8. (Optional) In the **Custom Insights** section, you may provide a list of ad statistics entries. Each entry should have a unique name and can contain fields, breakdowns or action_breakdowns. Fields refer to the different data points you can collect from an ad, while breakdowns and action_breakdowns let you segment this data for more detailed insights. Click on **Add** to create a new entry in this list.
+9. (Optional) In the **Custom Insights** section, you may provide a list of ad statistics entries. Each entry should have a unique name and can contain fields, breakdowns or action_breakdowns. Fields refer to the different data points you can collect from an ad, while breakdowns and action_breakdowns let you segment this data for more detailed insights. Click on **Add** to create a new entry in this list.
 
 To retrieve specific fields from Facebook Ads Insights combined with other breakdowns, you can choose which fields and breakdowns to sync. However, please note that not all fields can be requested, and many are only functional when combined with specific other fields. For example, the breakdown `app_id` is only supported with the `total_postbacks` field. For more information on the breakdown limitations, refer to the [Facebook documentation](https://developers.facebook.com/docs/marketing-api/insights/breakdowns).
 
@@ -154,18 +236,18 @@ To retrieve specific fields from Facebook Ads Insights combined with other break
 </FieldAnchor>
 
 <FieldAnchor field="page_size">
-9. (Optional) For **Page Size of Requests**, you can specify the number of records per page for paginated responses. Most users do not need to set this field unless specific issues arise or there are unique use cases that require tuning the connector's settings. The default value is set to retrieve 100 records per page.
+11. (Optional) For **Page Size of Requests**, you can specify the number of records per page for paginated responses. Most users do not need to set this field unless specific issues arise or there are unique use cases that require tuning the connector's settings. The default value is set to retrieve 100 records per page.
 </FieldAnchor>
 
 <FieldAnchor field="insights_lookback_window">
-10. (Optional) For **Insights Window Lookback**, you may set a window in days to revisit data during syncing to capture updated conversion data from the API. Facebook allows for attribution windows of up to 28 days, during which time a conversion can be attributed to an ad. If you have set a custom attribution window in your Facebook account, please set the same value here. Otherwise, you may leave it at the default value of 28. For more information on action attributions, please refer to [the Meta Help Center](https://www.facebook.com/business/help/458681590974355?id=768381033531365).
+12. (Optional) For **Insights Window Lookback**, you may set a window in days to revisit data during syncing to capture updated conversion data from the API. Facebook allows for attribution windows of up to 28 days, during which time a conversion can be attributed to an ad. If you have set a custom attribution window in your Facebook account, please set the same value here. Otherwise, you may leave it at the default value of 28. For more information on action attributions, please refer to [the Meta Help Center](https://www.facebook.com/business/help/458681590974355?id=768381033531365).
 </FieldAnchor>
 
 <FieldAnchor field="insights_job_timeout">
-11. (Optional) For **Insights Job Timeout**, you may set a custom value in range from 10 to 60. It establishes the maximum amount of time (in minutes) of waiting for the report job to complete.
+13. (Optional) For **Insights Job Timeout**, you may set a custom value in range from 10 to 60. It establishes the maximum amount of time (in minutes) of waiting for the report job to complete.
 </FieldAnchor>
 
-12. Click **Set up source** and wait for the tests to complete.
+14. Click **Set up source** and wait for the tests to complete.
 
 <HideInUI>
 
@@ -180,20 +262,25 @@ The Facebook Marketing source connector supports the following [sync modes](http
 
 ## Supported Streams
 
-- [Activities](https://developers.facebook.com/docs/marketing-api/reference/ad-activity)
-- [AdAccount](https://developers.facebook.com/docs/marketing-api/business-asset-management/guides/ad-accounts)
-- [AdCreatives](https://developers.facebook.com/docs/marketing-api/reference/ad-creative#fields)
-- [AdSets](https://developers.facebook.com/docs/marketing-api/reference/ad-campaign#fields)
-- [Ads](https://developers.facebook.com/docs/marketing-api/reference/adgroup#fields)
-- [AdInsights](https://developers.facebook.com/docs/marketing-api/reference/adgroup/insights/)
-- [Campaigns](https://developers.facebook.com/docs/marketing-api/reference/ad-campaign-group#fields)
-- [CustomConversions](https://developers.facebook.com/docs/marketing-api/reference/custom-conversion)
-- [CustomAudiences](https://developers.facebook.com/docs/marketing-api/reference/custom-audience)
-  :::info Custom Audiences
-  The `rule` field in the `Custom Audiences` stream may not be synced for all records due to limitations with the Facebook Marketing API. Syncing this field may also cause your sync to return the error message `Please reduce the amount of data` See our Troubleshooting section for more information.
-  :::
-- [Images](https://developers.facebook.com/docs/marketing-api/reference/ad-image)
-- [Videos](https://developers.facebook.com/docs/marketing-api/reference/video)
+| Stream Name                                       | API Docs                                                                                                        | Supports Full Refresh | Supports Incremental |
+| :------------------------------------------------ | :-------------------------------------------------------------------------------------------------------------- | :-------------------- |:--------------------------- |
+| activities                                         | [Latest](https://developers.facebook.com/docs/marketing-api/reference/ad-activity)                              | ✅                    | ✅                          |
+| ad_account                                         | [Latest](https://developers.facebook.com/docs/marketing-api/business-asset-management/guides/ad-accounts)       | ✅                    | ❌                          |
+| ad_creatives                                       | [Latest](https://developers.facebook.com/docs/marketing-api/reference/ad-creative#fields)                       | ✅                    | ❌                          |
+| ad_sets                                            | [Latest](https://developers.facebook.com/docs/marketing-api/reference/ad-campaign#fields)                       | ✅                    | ✅                          |
+| ads                                                | [Latest](https://developers.facebook.com/docs/marketing-api/reference/adgroup#fields)                           | ✅                    | ✅                          |
+| ads_insights                                       | [Latest](https://developers.facebook.com/docs/marketing-api/reference/adgroup/insights/)                        | ✅                    | ✅                          |
+| campaigns                                         | [Latest](https://developers.facebook.com/docs/marketing-api/reference/ad-campaign-group#fields)                 | ✅                    | ✅                          |
+| custom_conversions                                | [Latest](https://developers.facebook.com/docs/marketing-api/reference/custom-conversion)                        | ✅                    | ❌                          |
+| custom_audiences                                  | [Latest](https://developers.facebook.com/docs/marketing-api/reference/custom-audience)                          | ✅                    | ❌                          |
+| images                                            | [Latest](https://developers.facebook.com/docs/marketing-api/reference/ad-image)                                 | ✅                    | ✅                          |
+| videos                                            | [Latest](https://developers.facebook.com/docs/marketing-api/reference/video)                                    | ✅                    | ✅                          |
+
+**Notes on Streams:**
+
+:::info Custom Audiences
+The `rule` field in the `Custom Audiences` stream may not be synced for all records due to limitations with the Facebook Marketing API. Syncing this field may also cause your sync to return the error message `Please reduce the amount of data` See our Troubleshooting section for more information.
+:::
 
 Airbyte also supports the following Prebuilt Facebook Ad Insights Reports:
 
@@ -269,7 +356,22 @@ This response indicates that the Facebook Graph API requires you to reduce the f
 
 | Version | Date       | Pull Request                                             | Subject                                                                                                                                                                                                                                                                                           |
 |:--------|:-----------|:---------------------------------------------------------|:--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| 3.5.0 | 2025-05-05 | [59655](https://github.com/airbytehq/airbyte/pull/59655) | Add `attribution_spec` field to `ad_sets` stream |
+| 4.1.0 | 2025-05-29 | [59655](https://github.com/airbytehq/airbyte/pull/59655) | Add `attribution_spec` field to `ad_sets` stream |
+| 4.0.0 | 2025-08-25 | [65533](https://github.com/airbytehq/airbyte/pull/65533) | Migrate to Marketing API v23 |
+| 3.5.12 | 2025-08-23 | [65288](https://github.com/airbytehq/airbyte/pull/65288) | Update dependencies |
+| 3.5.11 | 2025-08-19 | [64911](https://github.com/airbytehq/airbyte/pull/64911) | Allow overriding action breakdowns for default Ads Insights stream. |
+| 3.5.10 | 2025-08-16 | [65010](https://github.com/airbytehq/airbyte/pull/65010) | Update dependencies |
+| 3.5.9 | 2025-08-09 | [64679](https://github.com/airbytehq/airbyte/pull/64679) | Update dependencies |
+| 3.5.8 | 2025-08-02 | [64406](https://github.com/airbytehq/airbyte/pull/64406) | Update dependencies |
+| 3.5.7 | 2025-07-26 | [63934](https://github.com/airbytehq/airbyte/pull/63934) | Update dependencies |
+| 3.5.6 | 2025-07-19 | [63604](https://github.com/airbytehq/airbyte/pull/63604) | Update dependencies |
+| 3.5.5 | 2025-07-12 | [63029](https://github.com/airbytehq/airbyte/pull/63029) | Update dependencies |
+| 3.5.4 | 2025-07-05 | [62811](https://github.com/airbytehq/airbyte/pull/62811) | Update dependencies |
+| 3.5.3 | 2025-06-28 | [62413](https://github.com/airbytehq/airbyte/pull/62413) | Update dependencies |
+| 3.5.2 | 2025-06-21 | [61958](https://github.com/airbytehq/airbyte/pull/61958) | Update dependencies |
+| 3.5.1 | 2025-06-14 | [61290](https://github.com/airbytehq/airbyte/pull/61290) | Update dependencies |
+| 3.5.0 | 2025-06-09 | [61477](https://github.com/airbytehq/airbyte/pull/61477) | Removed action_report_time from spec as deprecated |
+| 3.4.9 | 2025-05-24 | [60025](https://github.com/airbytehq/airbyte/pull/60025) | Update dependencies |
 | 3.4.8 | 2025-05-03 | [58889](https://github.com/airbytehq/airbyte/pull/58889) | Update dependencies |
 | 3.4.7 | 2025-04-19 | [58296](https://github.com/airbytehq/airbyte/pull/58296) | Update dependencies |
 | 3.4.6 | 2025-04-12 | [57827](https://github.com/airbytehq/airbyte/pull/57827) | Update dependencies |
@@ -286,7 +388,7 @@ This response indicates that the Facebook Graph API requires you to reduce the f
 | 3.3.31 | 2025-02-11 | [53626](https://github.com/airbytehq/airbyte/pull/53626) | Log Utilization type |
 | 3.3.30 | 2025-02-08 | [53330](https://github.com/airbytehq/airbyte/pull/53330) | Update dependencies |
 | 3.3.29 | 2025-02-01 | [52835](https://github.com/airbytehq/airbyte/pull/52835) | Update dependencies |
-| 3.3.28 | 2025-01-27 | [52032](https://github.com/airbytehq/airbyte/pull/52032) | Update to API version 21
+| 3.3.28 | 2025-01-27 | [52032](https://github.com/airbytehq/airbyte/pull/52032) | Update to API version 21 |
 | 3.3.27 | 2025-01-25 | [52365](https://github.com/airbytehq/airbyte/pull/52365) | Update dependencies |
 | 3.3.26 | 2025-01-18 | [51706](https://github.com/airbytehq/airbyte/pull/51706) | Update dependencies |
 | 3.3.25 | 2025-01-11 | [51080](https://github.com/airbytehq/airbyte/pull/51080) | Update dependencies |

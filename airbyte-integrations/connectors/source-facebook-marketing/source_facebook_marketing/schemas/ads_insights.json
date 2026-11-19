@@ -283,10 +283,6 @@
       "description": "Return on ad spend for purchases",
       "$ref": "ads_action_stats.json"
     },
-    "qualifying_question_qualify_answer_rate": {
-      "description": "Rate of qualifying question answer qualification",
-      "type": ["null", "number"]
-    },
     "quality_ranking": {
       "description": "Ranking based on quality",
       "type": ["null", "string"]
@@ -407,10 +403,6 @@
     "website_purchase_roas": {
       "description": "Return on ad spend for website purchases",
       "$ref": "ads_action_stats.json"
-    },
-    "wish_bid": {
-      "description": "Bid based on the wish to achieve certain results",
-      "type": ["null", "number"]
     }
   },
   "type": ["null", "object"]

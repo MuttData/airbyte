@@ -545,6 +545,23 @@ class TestBaseInsightsStream:
         assert "account_currency" in fields
         assert "actions" in fields
 
+    def test_fields_excludes_fields_rejected_by_api(self, api, some_config):
+        stream = AdsInsights(
+            api=api,
+            account_ids=some_config["account_ids"],
+            start_date=datetime(2010, 1, 1),
+            end_date=datetime(2011, 1, 1),
+            insights_lookback_window=28,
+        )
+        stream.configured_json_schema = {
+            "properties": {
+                "account_id": {"type": ["null", "string"]},
+                "qualifying_question_qualify_answer_rate": {"type": ["null", "number"]},
+            }
+        }
+
+        assert stream.fields() == ["account_id"]
+
     def test_fields_custom(self, api, some_config):
         stream = AdsInsights(
             api=api,

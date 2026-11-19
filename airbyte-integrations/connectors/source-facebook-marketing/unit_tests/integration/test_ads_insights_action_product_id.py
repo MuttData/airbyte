@@ -108,7 +108,6 @@ _JOB_START_FIELDS = [
     "outbound_clicks",
     "outbound_clicks_ctr",
     "purchase_roas",
-    "qualifying_question_qualify_answer_rate",
     "quality_ranking",
     "reach",
     "social_spend",

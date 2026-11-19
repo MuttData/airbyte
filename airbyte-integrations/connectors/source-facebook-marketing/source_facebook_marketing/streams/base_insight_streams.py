@@ -676,6 +676,8 @@ class AdsInsights(FBMarketingIncrementalStream):
         removable_keys = list(self.breakdowns if self.breakdowns else [])
         # Having this field in syncs seem to have caused data inaccuracy where fields like `spend` had the wrong values
         removable_keys.append("wish_bid")
+        # Meta rejects the whole insights request with error #100 when this field is requested
+        removable_keys.append("qualifying_question_qualify_answer_rate")
         for removable_key in removable_keys:
             try:
                 self._fields.remove(removable_key)

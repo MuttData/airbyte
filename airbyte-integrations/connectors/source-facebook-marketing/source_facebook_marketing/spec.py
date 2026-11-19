@@ -21,7 +21,7 @@ logger = logging.getLogger("airbyte")
 
 # Those fields were removed as there were causing `Tried accessing nonexisting field on node type` error from Meta
 # For more information, see https://github.com/airbytehq/airbyte/pull/38860
-_REMOVED_FIELDS = ["conversion_lead_rate", "cost_per_conversion_lead", "adset_start"]
+_REMOVED_FIELDS = ["conversion_lead_rate", "cost_per_conversion_lead", "adset_start", "qualifying_question_qualify_answer_rate"]
 adjusted_ads_insights_fields = {key: value for key, value in AdsInsights.Field.__dict__.items() if key not in _REMOVED_FIELDS}
 ValidFields = Enum("ValidEnums", adjusted_ads_insights_fields)
 
